@@ -1,6 +1,6 @@
 # lucky_webhook
 用于lucky的web前台界面，添加stun穿透后，自动显示在网站中，点击即可跳转，右键可删除或者复制
-
+![截图](https://raw.githubusercontent.com/xuebaiyo/lucky_webhook/refs/heads/main/%E6%88%AA%E5%9B%BE.png "截图")
 程序需要搭配lucky使用
 
 使用webhook获取最新的穿透地址和端口并显示，点击可直接跳转，长按可复制，删除数据
