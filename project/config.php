@@ -1,7 +1,7 @@
 <?php
 //网站设置
-$currentDir = 'xxx';  //填入域名不带/
-$password = 'xxx';   //密码设置，程序访问密码
+$currentDir = 'xxx';  //填入域名不带/ 填入https链接
+$currentDirnossl = 'xxx';  //填入http域名
 
 //主目录设置
 $secretToken = "xxx"; //填入token，用于程序内部通讯
