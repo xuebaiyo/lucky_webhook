@@ -1,6 +1,7 @@
 <?php
 // 定义一个密钥，这个密钥需要和 HTML 文件中的密钥保持一致
 require 'project/config.php';
+//$secretToken = "154b8d46-7bdd-43aa-d742-3e7821045ca8";
 
 // 检查请求中是否包含正确的 token 参数
 if (!isset($_GET['token']) || $_GET['token'] !== $secretToken) {
