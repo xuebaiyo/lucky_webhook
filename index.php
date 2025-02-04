@@ -120,9 +120,9 @@ HTML;
 
         // 根据原始项目链接是否包含 '?ssl' 来决定重定向的协议
         if (strpos($_POST['projectLink'], '?ssl')!== false) {
-            $redirectUrl = 'https://start.xuebaitv.xyz/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDir.'/serapp/'. $projectName. '.html';
         } else {
-            $redirectUrl = 'http://serapp.xuebaitv.xyz/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDirnossl.'/serapp/'. $projectName. '.html';
         }
 
         // 执行重定向操作
