@@ -7,6 +7,7 @@
      '/js/pwa.js',
      '/js/sw.js',
      '/project/config.php',
+	 '/admin/del.php',
      // 添加其他需要缓存的资源路径
    ];
 

@@ -2,6 +2,7 @@
 
 require 'project/config.php';
 //设置opentoken
+//$targetToken='0SHRcH7m3OBCyhNXylt08gIP4kdeUnJ8'; //输入你的token,与lucky中opentoken一致
 
 
 // 存储内容的文本文件路径
