@@ -10,7 +10,7 @@
 
 1.上传并解压本项目到网站根目录
 
-2.   修改project/config.php中的域名和token，
+2.   修改project/config.php中的https和http域名和token，
 2.1  修改manifest3.json中的start_url为你自己的网站地址, guest文件夹中也有manifest3.json需要修改,
 2.3  设置程序密码
 
@@ -30,7 +30,7 @@
 
 请求头:   openToken:webhookReceiver.php中设置的token一致
 
-请求体:   #{ruleName}|http://#{ipAddr}
+请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl
 
 接口调用成功包含的字符串:   done
 
