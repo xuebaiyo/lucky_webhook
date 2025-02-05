@@ -95,6 +95,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_projects']))
     }
 }
 
+
+
+// 处理注销操作
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
+    // 删除 logged_in cookie
+    if (isset($_COOKIE['logged_in'])) {
+        setcookie('logged_in', '', time() - 3600, '/');
+        unset($_COOKIE['logged_in']);
+    }
+    // 重定向到指定的登录页面，将下面的 URL 替换为你实际的登录页面地址
+    $loginPageUrl = '/';
+    echo '<script type="text/javascript">';
+    echo 'window.top.location.href = "'. $loginPageUrl. '";';
+    echo '</script>';
+    exit;
+}
+
+
+
 // 生成 HTML 页面
 ?>
 <!DOCTYPE html>
@@ -132,6 +151,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_projects']))
             cursor: pointer;
             margin-bottom: 20px;
         }
+        .deletecookie-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
         @media (max-width: 768px) {
             .project-item {
                 width: 100%;
@@ -143,6 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_projects']))
     <div class="container">
         <form action="<?php echo $_SERVER['PHP_SELF'] . '?token=' . $_GET['token']; ?>" method="post">
             <button type="submit" class="delete-button">删除</button>
+            <input type="hidden" name="logout" value="1">
+            <button type="submit" class="deletecookie-button">注销</button>
             <div class="project-list">
                 <?php foreach ($latestLinks as $projectName => $info): ?>
                     <div class="project-item">
