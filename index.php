@@ -16,12 +16,13 @@ if (!isset($_COOKIE['logged_in']) || $_COOKIE['logged_in']!== 'true') {
         } else {
             // 密码错误，显示错误信息
             $error = '密码错误，请重试。';
+            header('Location: /guest');
         }
     }
 
     // 如果没有有效的 cookie 且没有通过验证，显示密码输入表单
     if (!isset($_COOKIE['logged_in']) || $_COOKIE['logged_in']!== 'true') {
-        ?>
+       ?>
         <!DOCTYPE html>
         <html lang="zh-CN">
         <head>
@@ -29,23 +30,29 @@ if (!isset($_COOKIE['logged_in']) || $_COOKIE['logged_in']!== 'true') {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>密码验证</title>
             <!-- 引入 Tailwind CSS CDN，用于快速构建美观的界面 -->
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            <link href="/style/tailwind.min.css" rel="stylesheet">
             <style>
             body {
-            background-image: url('https://api.dujin.org/bing/1920.php');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+                background-image: url('https://api.dujin.org/bing/1920.php');
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }
+            /* 为容器添加模糊效果 */
+         .blurred-container {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.3);
+                border-radius: 10px;
             }
             </style>
         </head>
-        
+
         <body class="font-sans flex justify-center items-center min-h-screen">
             <div class="container mx-auto p-4 blurred-container flex flex-col h-full justify-between">
                 <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">请输入密码</h1>
-                <?php if (isset($error)): ?>
-                    <p class="text-red-500 text-center mb-4"><?php echo $error; ?></p>
-                <?php endif; ?>
+                <?php if (isset($error)):?>
+                    <p class="text-red-500 text-center mb-4"><?php echo $error;?></p>
+                <?php endif;?>
                 <form method="post" class="flex flex-col items-center">
                     <input type="password" name="password" placeholder="密码" class="border border-gray-300 rounded-md p-2 mb-4 w-full max-w-xs">
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">验证</button>
@@ -66,7 +73,7 @@ $apiUrl = $currentDir. '/api.php?token='. $secretToken;
 $options = [
     'http' => [
         'header' => "Authorization: Bearer $secretToken\r\n",
-        'method' => 'GET'
+       'method' => 'GET'
     ]
 ];
 // 创建流上下文，用于后续的文件获取操作
@@ -90,11 +97,11 @@ if ($data === null && json_last_error()!== JSON_ERROR_NONE) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 获取表单提交的项目名称，并进行 HTML 转义处理
     $projectName = isset($_POST['projectName']) 
-      ? htmlspecialchars($_POST['projectName'], ENT_QUOTES, 'UTF-8') 
+     ? htmlspecialchars($_POST['projectName'], ENT_QUOTES, 'UTF-8') 
         : null;
     // 获取表单提交的项目链接，并进行 HTML 转义处理
     $projectLink = isset($_POST['projectLink']) 
-      ? htmlspecialchars($_POST['projectLink'], ENT_QUOTES, 'UTF-8') 
+     ? htmlspecialchars($_POST['projectLink'], ENT_QUOTES, 'UTF-8') 
         : null;
 
     // 检查项目名称和项目链接是否都存在
@@ -142,7 +149,7 @@ HTML;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>项目列表</title>
     <!-- 引入 Tailwind CSS CDN，用于快速构建美观的界面 -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/style/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             background-image: url('https://api.dujin.org/bing/1920.php');
@@ -157,14 +164,14 @@ HTML;
         }
 
         /* 为容器添加模糊效果 */
-      .blurred-container {
+     .blurred-container {
             backdrop-filter: blur(10px);
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 10px;
         }
 
         /* 模态框样式 */
-      .modal {
+     .modal {
             display: none;
             position: fixed;
             z-index: 1;
@@ -176,7 +183,7 @@ HTML;
             background-color: rgba(0,0,0,0.4);
         }
 
-      .modal-content {
+     .modal-content {
             /* 应用和容器一致的样式 */
             backdrop-filter: blur(10px);
             background-color: rgba(255, 255, 255, 0.3);
@@ -187,15 +194,15 @@ HTML;
             height: 80%;
         }
 
-      .close {
+     .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
 
-      .close:hover,
-      .close:focus {
+     .close:hover,
+     .close:focus {
             color: black;
             text-decoration: none;
             cursor: pointer;
@@ -228,9 +235,9 @@ HTML;
 HTML;
                 }
             }
-           ?>
+          ?>
         </ul>
-        
+
     </div>
 
     <script>

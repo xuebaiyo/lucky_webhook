@@ -1,6 +1,6 @@
 <?php
 // 定义API的URL和密钥
-require '../project/config.php';
+require $_SERVER['DOCUMENT_ROOT'] .'/project/config.php';
 $apiUrl = $currentDir.'/guest/api.php?token='.$secretToken2; 
 
 
@@ -37,17 +37,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $projectLink = str_replace('?ssl', '', $projectLink);
         }
         $htmlContent = '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale = 1.0"><title>'.$projectName.'</title><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body><iframe src="'.$projectLink.'" width="100%" height="100%" frameborder="0"></iframe></body></html>';
-        $filePath = __DIR__. '/serapp/'. $projectName. '.html';
-        if (!is_dir(__DIR__. '/serapp')) {
-            mkdir(__DIR__. '/serapp', 0755, true);
+        $filePath = __DIR__. '/guest/serapp/'. $projectName. '.html';
+        if (!is_dir(__DIR__. '/guest/serapp')) {
+            mkdir(__DIR__. '/guest/serapp', 0755, true);
         }
         file_put_contents($filePath, $htmlContent);
 
         // 判断链接是否原本包含?ssl来决定重定向的协议
         if (strpos($_POST['projectLink'], '?ssl')!== false) {
-            $redirectUrl = 'https://start.xuebaitv.xyz/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDir.'/guest/serapp/'. $projectName. '.html';
         } else {
-            $redirectUrl = 'http://serapp.xuebaitv.xyz/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDirnossl.'/guest/serapp/'. $projectName. '.html';
         }
 
         header('Location: '. $redirectUrl);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>项目列表</title>
+    <title>游客模式</title>
     <!-- 引入Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="font-sans flex justify-center items-center min-h-screen">
     <div class="container mx-auto p-4 blurred-container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">项目列表</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">可用项目</h1>
         <ul id="projectList" class="space-y-4">
             <?php
             if ($data) {

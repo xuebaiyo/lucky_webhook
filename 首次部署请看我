@@ -5,7 +5,8 @@
 
 程序总共有两个token，一个用于lucky与后端交互，一个用于web客户端与api交互
 
-程序将
+更新：替换除去/project/config.php的所有文件
+初始部署: 直接上传所有文件
 
 
 1.上传并解压本项目到网站根目录
@@ -14,7 +15,7 @@
 2.1  修改manifest3.json中的start_url为你自己的网站地址, guest文件夹中也有manifest3.json需要修改,
 2.3  设置程序密码
 
-3.访问网站
+3.访问网站，输入设置好的密码进入，密码错误会跳转游客模式
 
 4.按步骤5配置好lucky后，项目会自动整理并显示所有通过stun穿透的项目, 程序内置两个菜单，一个是主目录，一个是游客目录，位于guest文件夹，访问方式:http://域名/guest
 
@@ -28,7 +29,7 @@
 
 请求方法:   post
 
-请求头:   openToken:webhookReceiver.php中设置的token一致
+请求头:   openToken:webhookReceiver.php中设置的token一致   《  $targetToken   》《  $targetToken2   》 的值
 
 请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl
 
