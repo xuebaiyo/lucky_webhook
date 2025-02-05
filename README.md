@@ -2,6 +2,9 @@
 
 ![image](https://github.com/user-attachments/assets/c128c7c2-41c7-41e2-8e84-61168e078468)
 
+![image](https://github.com/user-attachments/assets/44f4a803-08bc-4d8c-b252-aa950d89d207)
+
+
 
 项目需要php环境，推荐nginx+php
 
