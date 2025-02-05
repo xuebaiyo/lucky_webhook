@@ -1,8 +1,24 @@
+本程序部署完成后，可以直接使用固定地址访问被lucky stun穿透的项目
+每个项目具备一个页面，当程序收到webhook时会自动创建或者更新
+默认使用项目名创建页面，例：项目名.html
+登录成功后，会创建cookie 缓存时间为12小时，12小时内，只需验证一次密码即可  点击管理可以删除多选或者单个项目
+密码错误会自动跳转到游客模式，只能显示guest中的的项目，不能管理项目
+程序支持pwa技术，当使用ssl时，可以直接安装为web apps
+
+程序截图如下：
+
+
 ![image](https://github.com/user-attachments/assets/9bd11c89-2865-4acd-ba1b-3503af4eff0d)
 
 ![image](https://github.com/user-attachments/assets/c128c7c2-41c7-41e2-8e84-61168e078468)
 
 ![image](https://github.com/user-attachments/assets/44f4a803-08bc-4d8c-b252-aa950d89d207)
+
+![image](https://github.com/user-attachments/assets/5edd90b1-2e01-4e7f-932b-3c3053f19553)
+
+![image](https://github.com/user-attachments/assets/1bf7be5a-1990-4ce9-ac0b-76f27e2845ec)
+
+
 
 
 
