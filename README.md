@@ -71,8 +71,6 @@
 
 可以使用bash脚本请求atouch.php脚本手动更新，格式为：http://域名/atouch.php?token=xxx    也可以等待下次收到webhook自动更新    
 
-修改/project/autostart.sh脚本中的域名和token即可 ，当每次收到webhook时会自动更新html
-
 ------------------------------------------------
 
 QQ群：891067598
