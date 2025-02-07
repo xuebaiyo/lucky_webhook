@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游客模式</title>
     <!-- 引入Tailwind CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/style/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             background-image: url('https://api.dujin.org/bing/1920.php');

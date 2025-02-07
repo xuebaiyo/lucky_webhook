@@ -1,13 +1,10 @@
    const CACHE_NAME = 'my-awesome-site-v1';
    const urlsToCache = [
-     '/',
      '/index.php',
-     '/api.php',
      '/logo.png',
      '/js/pwa.js',
      '/js/sw.js',
-     '/project/config.php',
-	 '/admin/del.php',
+	 '/style/tailwind.min.css',
      // 添加其他需要缓存的资源路径
    ];
 

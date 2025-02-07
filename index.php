@@ -251,24 +251,47 @@ HTML;
                     console.error('未获取到项目链接');
                     return;
                 }
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = window.location.href;
 
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'projectName';
-                nameInput.value = projectName;
+                // 检查文件中是否存在包含该项目名的行
+                const checkFileForProject = async () => {
+                    try {
+                        const response = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                        const data = await response.json();
+                        if (data.exists && data.copy) {
+                            // 复制地址
+                            const urlToCopy = data.url.replace(/^https?:\/\//, '');
+                            navigator.clipboard.writeText(urlToCopy).then(() => {
+                                alert('复制成功');
+                            }).catch((err) => {
+                                console.error('复制失败:', err);
+                            });
+                        } else {
+                            // 文件中不存在该项目，制作 HTML 页面并跳转
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = window.location.href;
 
-                const linkInput = document.createElement('input');
-                linkInput.type = 'hidden';
-                linkInput.name = 'projectLink';
-                linkInput.value = projectLink;
+                            const nameInput = document.createElement('input');
+                            nameInput.type = 'hidden';
+                            nameInput.name = 'projectName';
+                            nameInput.value = projectName;
 
-                form.appendChild(nameInput);
-                form.appendChild(linkInput);
-                document.body.appendChild(form);
-                form.submit();
+                            const linkInput = document.createElement('input');
+                            linkInput.type = 'hidden';
+                            linkInput.name = 'projectLink';
+                            linkInput.value = projectLink;
+
+                            form.appendChild(nameInput);
+                            form.appendChild(linkInput);
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    } catch (error) {
+                        console.error('检查文件时出错:', error);
+                    }
+                };
+
+                checkFileForProject();
             }
         });
     </script>
@@ -284,7 +307,7 @@ HTML;
     <footer class="text-center text-gray-600 fixed bottom-0 left-0 right-0 p-2 bg-white/75 backdrop-filter blur-10">
         <a href="https://home.xuebaitv.xyz" target="_blank" class="mr-2" style="color: white; text-decoration: none;">雪白</a>
         <span class="mx-2" style="color: white;">|</span>
-        <a href="#" id="adminLink" class="ml-2" data-url="/admin/del.php?token=<?php echo $secretToken;?>" style="color: white; text-decoration: none;">管理</a>
+        <a href="#" id="adminLink" class="ml-2" data-url="/admin/admin.php?token=<?php echo $secretToken;?>" style="color: white; text-decoration: none;">管理</a>
     </footer>
 
     <script>
@@ -305,13 +328,6 @@ HTML;
         // 点击关闭按钮时隐藏模态框
         closeBtn.addEventListener('click', function() {
             modal.style.display = 'none';
-        });
-
-        // 点击模态框外部时隐藏模态框
-        window.addEventListener('click', function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
         });
     </script>
 </body>

@@ -29,7 +29,7 @@
 
 请求方法:   post
 
-请求头:   openToken:webhookReceiver.php中设置的token一致   《  $targetToken   》《  $targetToken2   》 的值
+请求头:   openToken:webhookReceiver.php中设置的token一致
 
 请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl
 
