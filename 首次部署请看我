@@ -31,7 +31,7 @@
 
 请求头:   openToken:webhookReceiver.php中设置的token一致
 
-请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl
+请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl   建议ssl走单独的webhook而不是全局
 
 接口调用成功包含的字符串:   done
 

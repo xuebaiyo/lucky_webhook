@@ -37,17 +37,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $projectLink = str_replace('?ssl', '', $projectLink);
         }
         $htmlContent = '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale = 1.0"><title>'.$projectName.'</title><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body><iframe src="'.$projectLink.'" width="100%" height="100%" frameborder="0"></iframe></body></html>';
-        $filePath = __DIR__. '/guest/serapp/'. $projectName. '.html';
-        if (!is_dir(__DIR__. '/guest/serapp')) {
-            mkdir(__DIR__. '/guest/serapp', 0755, true);
+        $filePath = __DIR__. '/serapp/'. $projectName. '.html';
+        if (!is_dir(__DIR__. '/serapp')) {
+            mkdir(__DIR__. '/serapp', 0755, true);
         }
         file_put_contents($filePath, $htmlContent);
 
         // 判断链接是否原本包含?ssl来决定重定向的协议
         if (strpos($_POST['projectLink'], '?ssl')!== false) {
-            $redirectUrl = $currentDir.'/guest/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDir.'/serapp/'. $projectName. '.html';
         } else {
-            $redirectUrl = $currentDirnossl.'/guest/serapp/'. $projectName. '.html';
+            $redirectUrl = $currentDirnossl.'/serapp/'. $projectName. '.html';
         }
 
         header('Location: '. $redirectUrl);

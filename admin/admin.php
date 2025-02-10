@@ -12,6 +12,7 @@ if (!isset($_GET['token']) || $_GET['token'] !== $secretToken) {
 // 文件路径
 $filePath = $_SERVER['DOCUMENT_ROOT'] .'/project/webhook_contents.txt';
 $copyFilePath = $_SERVER['DOCUMENT_ROOT'] .'/project/copy.cfg';
+$jumpFilePath = $_SERVER['DOCUMENT_ROOT'] .'/project/jump.cfg';
 
 // 检查文件是否存在
 if (!file_exists($filePath)) {
@@ -122,6 +123,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['copy'])) {
         handleError('无法写入文件: '. error_get_last()['message'], 500);
     }
 }
+
+
+// 标记为 jump 的操作处理 +++
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Jump'])) {
+    $selectedProjects = isset($_POST['selected_projects']) && is_array($_POST['selected_projects']) ? $_POST['selected_projects'] : [];
+    $jumpLines = [];
+
+    foreach ($selectedProjects as $projectName) {
+        if (isset($latestLinks[$projectName])) {
+            $link = $latestLinks[$projectName]['link'];
+            // 直接使用原始链接（不移除协议）
+            $jumpLines[] = $projectName . '|jump|' . $link;
+        }
+    }
+
+    // 写入 jump.cfg 文件
+    $jumpFile = fopen($jumpFilePath, 'wb');
+    if ($jumpFile) {
+        foreach ($jumpLines as $line) {
+            fwrite($jumpFile, $line . PHP_EOL);
+        }
+        fclose($jumpFile);
+        redirectWithToken();
+        exit;
+    } else {
+        handleError('无法写入跳转文件: '. error_get_last()['message'], 500);
+    }
+}
+
 
 // 处理注销操作
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
@@ -237,6 +267,15 @@ exit;
             cursor: pointer;
             margin-bottom: 20px;
         }
+        .Jump-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
         .delete-button {
             background-color: #ff0000;
             color: #fff;
@@ -284,10 +323,11 @@ exit;
     <div class="container">
         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8') . '?token=' . htmlspecialchars($_GET['token'], ENT_QUOTES, 'UTF-8'); ?>" method="post">
             <button type="submit" class="delete-button" name="delete" value="1" title="删除被勾选的项目">删除项目</button>
-            <button type="submit" class="copy-button" name="copy" value="1" title="标记项目为点击项目只复制地址而不打开，每次点击都会清空之前的标记信息，如需标记多个项目，多选项目并标记即可，如需重置标记，不勾选任何项目直接点击标记即可">标记项目</button>
+            <button type="submit" class="copy-button" name="copy" value="1" title="标记项目为点击项目只复制地址而不打开，每次点击都会清空之前的标记信息，如需标记多个项目，多选项目并标记即可，如需重置标记，不勾选任何项目直接点击标记即可">标记复制</button>
+            <button type="submit" class="Jump-button" name="Jump" value="1" title="标记项目为点击项目直接跳转源地址而不使用嵌套">标记跳转</button>
             <button type="submit" class="deletehtml-button" name="clear_cache" title="清空所有自动生成的页面，下次收到webhook会重新生成">清空缓存</button>
+                        <button type="submit" class="guestm-button" value="1" name="guestm" title="管理游客模式下的项目">游客管理</button>
             <button type="submit" class="deletecookie-button" value="1" name="logout" title="注销登录，再次打开需要通过密码验证">注销登录</button>
-            <button type="submit" class="guestm-button" value="1" name="guestm" title="管理游客模式下的项目">游客管理</button>
             <div class="project-list">
                 <?php foreach ($latestLinks as $projectName => $info): ?>
                     <div class="project-item">

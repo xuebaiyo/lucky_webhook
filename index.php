@@ -243,7 +243,7 @@ HTML;
     <script>
         const secretToken = '<?php echo $secretToken;?>';
         const projectList = document.getElementById('projectList');
-        projectList.addEventListener('click', function (event) {
+        projectList.addEventListener('click', async function (event) {
             if (event.target.tagName === 'LI') {
                 const projectName = event.target.querySelector('span:first-child').textContent;
                 const projectLink = event.target.dataset.link;
@@ -255,36 +255,47 @@ HTML;
                 // 检查文件中是否存在包含该项目名的行
                 const checkFileForProject = async () => {
                     try {
-                        const response = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
-                        const data = await response.json();
-                        if (data.exists && data.copy) {
+                        // 检查是否只复制
+                        const responseCheckCopy = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                        const dataCheckCopy = await responseCheckCopy.json();
+
+                        if (dataCheckCopy.exists && dataCheckCopy.copy) {
                             // 复制地址
-                            const urlToCopy = data.url.replace(/^https?:\/\//, '');
+                            const urlToCopy = dataCheckCopy.url.replace(/^https?:\/\//, '');
                             navigator.clipboard.writeText(urlToCopy).then(() => {
                                 alert('复制成功');
                             }).catch((err) => {
                                 console.error('复制失败:', err);
                             });
                         } else {
-                            // 文件中不存在该项目，制作 HTML 页面并跳转
-                            const form = document.createElement('form');
-                            form.method = 'POST';
-                            form.action = window.location.href;
+                            // 检查 /project/jump.cfg 文件
+                            const responseJumpCfg = await fetch('check_jump_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                            const dataJumpCfg = await responseJumpCfg.json();
 
-                            const nameInput = document.createElement('input');
-                            nameInput.type = 'hidden';
-                            nameInput.name = 'projectName';
-                            nameInput.value = projectName;
+                            if (dataJumpCfg.exists) {
+                                // 直接跳转项目源 URL
+                                window.location.href = projectLink;
+                            } else {
+                                // 文件中不存在该项目，制作 HTML 页面并跳转
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = window.location.href;
 
-                            const linkInput = document.createElement('input');
-                            linkInput.type = 'hidden';
-                            linkInput.name = 'projectLink';
-                            linkInput.value = projectLink;
+                                const nameInput = document.createElement('input');
+                                nameInput.type = 'hidden';
+                                nameInput.name = 'projectName';
+                                nameInput.value = projectName;
 
-                            form.appendChild(nameInput);
-                            form.appendChild(linkInput);
-                            document.body.appendChild(form);
-                            form.submit();
+                                const linkInput = document.createElement('input');
+                                linkInput.type = 'hidden';
+                                linkInput.name = 'projectLink';
+                                linkInput.value = projectLink;
+
+                                form.appendChild(nameInput);
+                                form.appendChild(linkInput);
+                                document.body.appendChild(form);
+                                form.submit();
+                            }
                         }
                     } catch (error) {
                         console.error('检查文件时出错:', error);
