@@ -4,7 +4,9 @@
      '/logo.png',
      '/js/pwa.js',
      '/js/sw.js',
-	 '/style/tailwind.min.css',
+     '/check_rdp_cfg.php',
+     '/check_project.php',   
+     '/check_jump_cfg.php',   
      // 添加其他需要缓存的资源路径
    ];
 
