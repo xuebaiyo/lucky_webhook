@@ -17,30 +17,94 @@ if (!$projectName) {
     exit;
 }
 
-// 假设要检查的文件名为 example.txt，你可以根据实际情况修改
-$filePath = 'project/copy.cfg';
-if (file_exists($filePath)) {
-    // 打开文件
-    $file = fopen($filePath, 'r');
-    if ($file) {
-        while (($line = fgets($file))!== false) {
-            // 检查行中是否包含项目名
+$projectExists = false;
+// 从 project/copy.cfg 检查项目是否存在
+$copyConfigPath = 'project/copy.cfg';
+if (file_exists($copyConfigPath)) {
+    $copyConfigFile = fopen($copyConfigPath, 'r');
+    if ($copyConfigFile) {
+        while (($line = fgets($copyConfigFile))!== false) {
             if (strpos($line, $projectName)!== false) {
-                // 分割行内容，使用 | 作为分隔符
                 $parts = explode('|', $line);
                 if (isset($parts[1]) && trim($parts[1]) === 'copy') {
-                    // 第一个 | 后面是 copy，返回相关信息
-                    $url = isset($parts[2])? trim($parts[2]) : '';
-                    echo json_encode(['exists' => true, 'copy' => true, 'url' => $url]);
-                    fclose($file);
-                    exit;
+                    $projectExists = true;
+                    break;
                 }
             }
         }
-        fclose($file);
+        fclose($copyConfigFile);
     }
 }
 
-// 文件中不存在包含该项目名的行或者第一个 | 后面不是 copy
-echo json_encode(['exists' => false, 'copy' => false, 'url' => '']);
+if (!$projectExists) {
+    // 文件中不存在包含该项目名的行或者第一个 | 后面不是 copy
+    echo json_encode(['exists' => false, 'copy' => false, 'url' => '']);
+    exit;
+}
+
+// 项目存在，从 /project/webhook_contents.txt 中获取最新链接
+$webhookFilePath = __DIR__ . '/project/webhook_contents.txt';
+
+// 检查文件是否存在
+if (!file_exists($webhookFilePath)) {
+    http_response_code(404);
+    echo json_encode(['error' => '文件未找到']);
+    exit;
+}
+
+// 读取文件内容，使用二进制模式打开文件以处理不同换行符
+$webhookFile = @fopen($webhookFilePath, 'rb');
+if (!$webhookFile) {
+    http_response_code(404);
+    echo json_encode(['error' => '无法打开文件']);
+    exit;
+}
+
+$lines = [];
+while (($line = fgets($webhookFile))!== false) {
+    $lines[] = rtrim($line, "\r\n");
+}
+fclose($webhookFile);
+
+// 用于存储指定项目的最新链接信息
+$latestLink = null;
+
+// 遍历文件的每一行
+foreach ($lines as $line) {
+    // 分割每行内容
+    $parts = explode('|', $line);
+    if (count($parts)!== 3) {
+        // 记录错误日志，方便调试
+        error_log("Invalid line: $line");
+        continue;
+    }
+    list($currentProjectName, $link, $updateTime) = $parts;
+
+    // 确保时间格式能被 strtotime 正确解析
+    $currentTime = strtotime($updateTime);
+    if ($currentTime === false) {
+        // 记录错误日志，方便调试
+        error_log("Invalid time format in line: $line");
+        continue;
+    }
+
+    // 如果当前行的项目名与请求的项目名相同
+    if ($currentProjectName === $projectName) {
+        // 如果还没有记录最新链接，或者当前更新时间比之前记录的更新时间晚，则更新链接信息
+        if ($latestLink === null || $currentTime > strtotime($latestLink['update_time'])) {
+            $latestLink = [
+                'link' => $link,
+                'update_time' => $updateTime
+            ];
+        }
+    }
+}
+
+if ($latestLink!== null) {
+    // 找到对应项目的最新链接
+    echo json_encode(['exists' => true, 'copy' => true, 'url' => $latestLink['link']]);
+} else {
+    // 项目存在，但 webhook 文件中未找到对应链接
+    echo json_encode(['exists' => true, 'copy' => true, 'url' => '']);
+}
 ?>
