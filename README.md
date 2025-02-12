@@ -38,7 +38,7 @@
 
 1.上传并解压本项目到网站根目录   
 
-2.   修改project/config.php中的https和http域名和token，  
+2.   修改project/config.php中的https和http域名和token， 切记需要两个二级域名，一个开ssl一个不开，然后填入即可，如果没有或者不能使用另一个二级域名，那么全部使用http不使用https防止404 
 2.1  修改manifest3.json中的start_url为你自己的网站地址,
      guest文件夹中也有manifest3.json需要修改,   
 2.2  设置程序密码   
@@ -53,13 +53,13 @@
 
 打开菜单/stun穿透/设置中的全局Stun Webhook
 
-接口地址:   http:/域名/webhookReceiver.php
+接口地址:   http://域名/webhookReceiver.php  如果是ssl请使用https
 
 请求方法:   post
 
 请求头:   openToken:webhookReceiver.php中设置的token一致   《  $targetToken   》《  $targetToken2   》 的值
 
-请求体:  http： #{ruleName}|http://#{ipAddr}           https： #{ruleName}|https://#{ipAddr}?ssl
+请求体:  #{ruleName}|http://#{ipAddr}           #{ruleName}|https://#{ipAddr}?ssl
 
 接口调用成功包含的字符串:   done
 
