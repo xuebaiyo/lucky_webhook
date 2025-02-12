@@ -243,7 +243,21 @@ HTML;
     <script>
         const secretToken = '<?php echo $secretToken;?>';
         const projectList = document.getElementById('projectList');
-        projectList.addEventListener('click', async function (event) {
+
+        // 添加节流函数，防止频繁点击
+        const throttle = (func, delay) => {
+            let timer = null;
+            return function() {
+                if (!timer) {
+                    func.apply(this, arguments);
+                    timer = setTimeout(() => {
+                        timer = null;
+                    }, delay);
+                }
+            };
+        };
+
+        const handleProjectClick = async function (event) {
             if (event.target.tagName === 'LI') {
                 const projectName = event.target.querySelector('span:first-child').textContent;
                 const projectLink = event.target.dataset.link;
@@ -252,78 +266,75 @@ HTML;
                     return;
                 }
 
-                // 检查文件中是否存在包含该项目名的行
-                const checkFileForProject = async () => {
-                    try {
-                        // 检查是否只复制
-                        const responseCheckCopy = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent                (projectName));
-                        const dataCheckCopy = await responseCheckCopy.json();
+                try {
+                    // 检查是否只复制
+                    const responseCheckCopy = await fetch('check_project.php?token=' + encodeURIComponent(secretToken) + '&projectName=' + encodeURIComponent(projectName));
+                    const dataCheckCopy = await responseCheckCopy.json();
 
-                        if (dataCheckCopy.exists && dataCheckCopy.copy) {
-                            // 复制地址
-                            const urlToCopy = dataCheckCopy.url.replace(/^https?:\/\//, '');
-                            navigator.clipboard.writeText(urlToCopy).then(() => {
-                                alert('复制成功');
-                            }).catch((err) => {
-                                console.error('复制失败:', err);
-                            });
+                    if (dataCheckCopy.exists && dataCheckCopy.copy) {
+                        // 复制地址
+                        const urlToCopy = dataCheckCopy.url.replace(/^https?:\/\//, '');
+                        navigator.clipboard.writeText(urlToCopy).then(() => {
+                            alert('复制成功');
+                        }).catch((err) => {
+                            console.error('复制失败:', err);
+                        });
+                    } else {
+                        // 检查 /project/jump.cfg 文件
+                        const responseJumpCfg = await fetch('check_jump_cfg.php?token=' + encodeURIComponent(secretToken) + '&projectName=' + encodeURIComponent(projectName));
+                        const dataJumpCfg = await responseJumpCfg.json();
+
+                        if (dataJumpCfg.exists) {
+                            // 直接跳转项目源 URL
+                            window.location.href = projectLink;
                         } else {
-                            // 检查 /project/jump.cfg 文件
-                            const responseJumpCfg = await fetch('check_jump_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent                (projectName));
-                            const dataJumpCfg = await responseJumpCfg.json();
-
-                            if (dataJumpCfg.exists) {
-                                // 直接跳转项目源 URL
-                                window.location.href = projectLink;
-                            } else {
-                                // 检查 /project/rdp.cfg 文件
-                                const responseRdpCfg = await fetch('check_rdp_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
-                                const dataRdpCfg = await responseRdpCfg.json();
-                                    if (dataRdpCfg.exists && dataRdpCfg.rdp) {
-                                        // 下载 /serapp/desktop.rdp 文件
-                                        const link = document.createElement('a');
-                                        link.href = '/serapp/desktop.rdp';
-                                        link.download = 'desktop.rdp';
-                                        link.click();
-                                        if (dataRdpCfg.url) {
-                                            // 如果有最新链接，可根据需求处理，这里仅示例输出
-                                            console.log('最新链接：', dataRdpCfg.url);
-                                        }
-                                    } else {
-                                        // 文件中不存在该项目，制作 HTML 页面并跳转
-                                    // 文件中不存在该项目，制作 HTML 页面并跳转
-                                    const form = document.createElement('form');
-                                    form.method = 'POST';
-                                    form.action = window.location.href;
-
-                                    const nameInput = document.createElement('input');
-                                    nameInput.type = 'hidden';
-                                    nameInput.name = 'projectName';
-                                    nameInput.value = projectName;
-
-                                    const linkInput = document.createElement('input');
-                                    linkInput.type = 'hidden';
-                                    linkInput.name = 'projectLink';
-                                    linkInput.value = projectLink;
-
-                                    form.appendChild(nameInput);
-                                    form.appendChild(linkInput);
-                                    document.body.appendChild(form);
-                                    form.submit();
+                            // 检查 /project/rdp.cfg 文件
+                            const responseRdpCfg = await fetch('check_rdp_cfg.php?token=' + encodeURIComponent(secretToken) + '&projectName=' + encodeURIComponent(projectName));
+                            const dataRdpCfg = await responseRdpCfg.json();
+                            if (dataRdpCfg.exists && dataRdpCfg.rdp) {
+                                // 下载 /serapp/desktop.rdp 文件
+                                const link = document.createElement('a');
+                                link.href = '/serapp/desktop.rdp';
+                                link.download = 'desktop.rdp';
+                                link.click();
+                                if (dataRdpCfg.url) {
+                                    // 如果有最新链接，可根据需求处理，这里仅示例输出
+                                    console.log('最新链接：', dataRdpCfg.url);
                                 }
+                            } else {
+                                // 文件中不存在该项目，制作 HTML 页面并跳转
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = window.location.href;
+
+                                const nameInput = document.createElement('input');
+                                nameInput.type = 'hidden';
+                                nameInput.name = 'projectName';
+                                nameInput.value = projectName;
+
+                                const linkInput = document.createElement('input');
+                                linkInput.type = 'hidden';
+                                linkInput.name = 'projectLink';
+                                linkInput.value = projectLink;
+
+                                form.appendChild(nameInput);
+                                form.appendChild(linkInput);
+
+                                document.body.appendChild(form);
+                                form.submit();
                             }
                         }
-                    } catch (error) {
-                        console.error('检查文件时出错:', error);
                     }
-                };
-
-                checkFileForProject();
+                } catch (error) {
+                    console.error('请求出错:', error);
+                }
             }
-        });
-    </script>
+        };
 
-    <!-- 模态框 -->
+        // 使用节流函数绑定点击事件
+        projectList.addEventListener('click', throttle(handleProjectClick, 500));
+    </script>
+        <!-- 模态框 -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
