@@ -9,10 +9,12 @@ if (!isset($_GET['token']) || $_GET['token'] !== $secretToken) {
     exit;
 }
 
-// 文件路径
+// 设置配置文件路径
 $filePath = $_SERVER['DOCUMENT_ROOT'] .'/project/webhook_contents.txt';
 $copyFilePath = $_SERVER['DOCUMENT_ROOT'] .'/project/copy.cfg';
 $jumpFilePath = $_SERVER['DOCUMENT_ROOT'] .'/project/jump.cfg';
+$rdpPath = $_SERVER['DOCUMENT_ROOT'] .'/project/rdp.cfg';
+
 
 // 检查文件是否存在
 if (!file_exists($filePath)) {
@@ -153,6 +155,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Jump'])) {
 }
 
 
+// 处理标记为 远程桌面 操作
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['connectrdp'])) {
+    $selectedProjects = isset($_POST['selected_projects']) && is_array($_POST['selected_projects']) ? $_POST['selected_projects'] : [];
+    $copyLines = [];
+
+    foreach ($selectedProjects as $projectName) {
+        // 获取对应项目的链接
+        if (isset($latestLinks[$projectName])) {
+            $link = $latestLinks[$projectName]['link'];
+            // 去除链接中的 http:// 或者 https://
+            $link = str_replace(['http://', 'https://'], '', $link);
+            $copyLines[] = $projectName . '|rdp|' . $link;
+        }
+    }
+
+    // 将新内容写回 copy.cfg 文件
+    $copyFile = fopen($rdpPath, 'wb');
+    if ($copyFile) {
+        foreach ($copyLines as $line) {
+            fwrite($copyFile, $line . PHP_EOL);
+        }
+        fclose($copyFile);
+        // 刷新页面
+        redirectWithToken();
+        exit;
+    } else {
+        handleError('无法写入文件: '. error_get_last()['message'], 500);
+    }
+}
+
+
 // 处理注销操作
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
     // 删除 logged_in cookie
@@ -267,6 +300,15 @@ exit;
             cursor: pointer;
             margin-bottom: 20px;
         }
+        .rdp-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
         .Jump-button {
             background-color: #ff0000;
             color: #fff;
@@ -325,6 +367,7 @@ exit;
             <button type="submit" class="delete-button" name="delete" value="1" title="删除被勾选的项目">删除项目</button>
             <button type="submit" class="copy-button" name="copy" value="1" title="标记项目为点击项目只复制地址而不打开，每次点击都会清空之前的标记信息，如需标记多个项目，多选项目并标记即可，如需重置标记，不勾选任何项目直接点击标记即可">标记复制</button>
             <button type="submit" class="Jump-button" name="Jump" value="1" title="标记项目为点击项目直接跳转源地址而不使用嵌套">标记跳转</button>
+            <button type="submit" class="rdp-button" name="connectrdp" value="1" title="标记项目远程桌面，当项目被点击后，自动生成并下载远程桌面的rdp文件，打开文件直接连接桌面（支援任何可通过文件启动的rdp远程客户端）">远程桌面</button>
             <button type="submit" class="deletehtml-button" name="clear_cache" title="清空所有自动生成的页面，下次收到webhook会重新生成">清空缓存</button>
                         <button type="submit" class="guestm-button" value="1" name="guestm" title="管理游客模式下的项目">游客管理</button>
             <button type="submit" class="deletecookie-button" value="1" name="logout" title="注销登录，再次打开需要通过密码验证">注销登录</button>

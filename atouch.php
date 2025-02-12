@@ -96,5 +96,39 @@ HTML;
     file_put_contents($saveFilePath, $htmlContent);
 }
 
-echo "update_done:所有最新项目的HTML文件已成功创建或替换。";
+
+
+// 读取 project/rdp.cfg 文件
+$rdpCfgPath = __DIR__. '/project/rdp.cfg';
+if (file_exists($rdpCfgPath) && filesize($rdpCfgPath) > 0) {
+    $rdpCfgContent = file_get_contents($rdpCfgPath);
+    $parts = explode('|', $rdpCfgContent);
+    $targetProjectName = $parts[0];
+
+    // 检查最新链接信息中是否存在目标项目
+    if (isset($latestLinks[$targetProjectName])) {
+        $newAddress = $latestLinks[$targetProjectName]['link'];
+        // 去除 http:// 和 https://
+        $newAddress = preg_replace('#^https?://#', '', $newAddress);
+
+        // 读取 project/rdp 文件
+        $rdpFilePath = __DIR__. '/project/rdp';
+        $rdpContent = file_get_contents($rdpFilePath);
+
+        // 替换 full address:s: 的值
+        $rdpContent = preg_replace('/full address:s:.*/', "full address:s:$newAddress", $rdpContent);
+
+        // 确保 serapp 目录存在
+        if (!is_dir(__DIR__. '/serapp')) {
+            mkdir(__DIR__. '/serapp', 0755, true);
+        }
+
+        // 将修改后的内容写入 serapp/desktop.rdp 文件
+        $outputRdpPath = __DIR__. '/serapp/desktop.rdp';
+        file_put_contents($outputRdpPath, $rdpContent);
+
+        //echo " RDP文件更新完成，新地址为: $newAddress";
+    }
+}
+echo "update_done:项目更新成功！";
 ?>

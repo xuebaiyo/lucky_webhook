@@ -256,7 +256,7 @@ HTML;
                 const checkFileForProject = async () => {
                     try {
                         // 检查是否只复制
-                        const responseCheckCopy = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                        const responseCheckCopy = await fetch('check_project.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent                (projectName));
                         const dataCheckCopy = await responseCheckCopy.json();
 
                         if (dataCheckCopy.exists && dataCheckCopy.copy) {
@@ -269,32 +269,48 @@ HTML;
                             });
                         } else {
                             // 检查 /project/jump.cfg 文件
-                            const responseJumpCfg = await fetch('check_jump_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                            const responseJumpCfg = await fetch('check_jump_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent                (projectName));
                             const dataJumpCfg = await responseJumpCfg.json();
 
                             if (dataJumpCfg.exists) {
                                 // 直接跳转项目源 URL
                                 window.location.href = projectLink;
                             } else {
-                                // 文件中不存在该项目，制作 HTML 页面并跳转
-                                const form = document.createElement('form');
-                                form.method = 'POST';
-                                form.action = window.location.href;
+                                // 检查 /project/rdp.cfg 文件
+                                const responseRdpCfg = await fetch('check_rdp_cfg.php?token=<?php echo $secretToken;?>&projectName=' + encodeURIComponent(projectName));
+                                const dataRdpCfg = await responseRdpCfg.json();
+                                    if (dataRdpCfg.exists && dataRdpCfg.rdp) {
+                                        // 下载 /serapp/desktop.rdp 文件
+                                        const link = document.createElement('a');
+                                        link.href = '/serapp/desktop.rdp';
+                                        link.download = 'desktop.rdp';
+                                        link.click();
+                                        if (dataRdpCfg.url) {
+                                            // 如果有最新链接，可根据需求处理，这里仅示例输出
+                                            console.log('最新链接：', dataRdpCfg.url);
+                                        }
+                                    } else {
+                                        // 文件中不存在该项目，制作 HTML 页面并跳转
+                                    // 文件中不存在该项目，制作 HTML 页面并跳转
+                                    const form = document.createElement('form');
+                                    form.method = 'POST';
+                                    form.action = window.location.href;
 
-                                const nameInput = document.createElement('input');
-                                nameInput.type = 'hidden';
-                                nameInput.name = 'projectName';
-                                nameInput.value = projectName;
+                                    const nameInput = document.createElement('input');
+                                    nameInput.type = 'hidden';
+                                    nameInput.name = 'projectName';
+                                    nameInput.value = projectName;
 
-                                const linkInput = document.createElement('input');
-                                linkInput.type = 'hidden';
-                                linkInput.name = 'projectLink';
-                                linkInput.value = projectLink;
+                                    const linkInput = document.createElement('input');
+                                    linkInput.type = 'hidden';
+                                    linkInput.name = 'projectLink';
+                                    linkInput.value = projectLink;
 
-                                form.appendChild(nameInput);
-                                form.appendChild(linkInput);
-                                document.body.appendChild(form);
-                                form.submit();
+                                    form.appendChild(nameInput);
+                                    form.appendChild(linkInput);
+                                    document.body.appendChild(form);
+                                    form.submit();
+                                }
                             }
                         }
                     } catch (error) {
